@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: 144-nginx-deployment
+  labels:
+    app: 144-nginx
+spec:
+  replicas: 3
+  selector: 
+    matchLabels: 
+      app: 144-nginx
+  template:
+    metadata: 
+      labels:
+        app: 144-nginx
+    spec: 
+      containers:
+      - name: nginx
+        image: 172.1.14.168:5001/nginx
+        imagePullPolicy: "Always"      **** only for 2nd one
+        ports:
+        - containerPort: 80
+
+kubectl apply -f dep.yaml
+kubectl get pods | grep 144-nginx
+kubectl expose deployment 144-nginx-deployment --type=NodePort --name=144-nginx-service
+kubectl get svc |grep 144-nginx
+kubectl port-forward deployment/144-nginx-deployment newPort:<nodePort>
+
+
+kubectl apply -f dep.yaml
+kubectl get pods | grep 144-nginx
+kubectl expose deployment 144-nginx-deployment --type=NodePort --name=144-nginx-service
+kubectl describe deploy 144-nginx-deployment | grep Image:
+kubectl set image deployment/144-nginx-deployment nginx=new144nginxImage
+kubectl describe deploy 144-nginx-deployment | grep Image:
+
+
+
+kubectl run 144-nginx1 --image=nginx --restart=Never --labels=app=144-v1
+kubectl run 144-nginx2 --image=nginx --restart=Never --labels=app=144-v2
+kubectl run 144-nginx3 --image=nginx --restart=Never --labels=app=144-v3
+kubectl get po --show-labels
+kubectl get po -l app=144-v2
+kubectl label po nginx1 nginx2 nginx3 app-
+
+
+
+apiVersion: v1
+Kind: Pod
+metadata: 
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  containers:
+  - name: ubuntu
+    image: 172.1.14.168/ubuntu
+    command: ["/bin/bash"]
+    args: ["-c", "echo SHRADHA"]
+
+kubectl apply -f dep.yaml
+kubectl logs ubuntu
+kubect; delete pod ubuntu
+
+apiVersion: v1
+Kind: Pod
+metadata: 
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec: 
+  containers: 
+  - name: ubuntu
+    image: 172.1.14.168/ubuntu
+    env:
+      - name: MESSAGE
+        value: "MSRIT"
+    command: ["/bin/bash"]
+    args: ["$(MESSAGE)"]
